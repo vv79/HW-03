@@ -1,0 +1,16 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News search
+{% endblock title %}
+
+{% block content %}
+<h1>News search</h1>
+<hr>
+<form action="/news" method="get" >
+    {{ filter.form.non_field_errors }}
+    {{ filter.form.as_p }}
+    <input type="submit" class="btn btn-primary" value="Search" />
+    <a class="btn btn-secondary" href="{% url 'news_list' %}">Cancel</a>
+</form>
+{% endblock content %}
