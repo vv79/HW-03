@@ -159,16 +159,6 @@ ACCOUNT_FORMS = {'signup': 'user.forms.BaseSignupForm'}
 SOCIALACCOUNT_AUTO_SIGNUP = False
 SOCIALACCOUNT_FORMS = {'signup': 'user.forms.SocialSignupForm'}
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '184321105083-m18vhk9j0pev5smtusi2l2nf4bu8jt16.apps.googleusercontent.com',
-            'secret': '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',
-            'key': ''
-        }
-    }
-}
-
 SITE_ID = 1
 
 STATICFILES_DIRS = [
