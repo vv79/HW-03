@@ -7,32 +7,59 @@
         <meta name="author" content="" />
         <title>{% block title %} {% endblock title %}</title>
         {% load static %}
+        {% load bootstrap4 %}
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+        {% bootstrap_css %}
+        {% bootstrap_javascript jquery='full' %}
     </head>
     <body>
         {% block menu %}
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
             <div class="container">
-                <a class="navbar-brand" href="#">Start Bootstrap</a>
+                <a class="navbar-brand" href="#">News Paper</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="collapse navbar-collapse">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <li class="nav-item"><a class="nav-link{% if request.path == '/' %} active{% endif %}" aria-current="page" href="/">Home</a></li>
                         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'news_list' %} active{% endif %}" aria-current="page" href="{% url 'news_list' %}">News</a></li>
                         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'article_list' %} active{% endif %}" aria-current="page" href="{% url 'article_list' %}">Articles</a></li>
-<!--                        <li class="nav-item"><a class="nav-link{% if request.path == '/about-us/' %} active{% endif %}" href="/about-us/">About Us</a></li>-->
-<!--                        <li class="nav-item"><a class="nav-link" href="/contact-us/">Contact Us</a></li>-->
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'protected' %} active{% endif %}" aria-current="page" href="{% url 'protected' %}">Protected page</a></li>
                     </ul>
                 </div>
+                {% if request.user.is_authenticated %}
+                    <span class="navbar-text mx-2">You are loggen in as:</span>
+                    <a class="navbar-text{% if request.resolver_match.view_name == 'profile' %} active{% endif %}" aria-current="page" href="{% url 'profile' %}">
+                        <i class="fa-solid fa-user"></i>
+                        {{ request.user.username }}
+                    </a>
+                    <span class="navbar-text mx-2">|</span>
+                    <a class="navbar-text{% if request.resolver_match.view_name == 'logout' %} active{% endif %}" aria-current="page" href="{% url 'logout' %}">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </a>
+                    {% else %}
+                    <a class="navbar-text{% if request.resolver_match.view_name == 'login' %} active{% endif %}" aria-current="page" href="{% url 'login' %}">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        Login
+                    </a>
+                    <span class="navbar-text mx-2">|</span>
+                    <a class="navbar-text{% if request.resolver_match.view_name == 'signup' %} active{% endif %}" aria-current="page" href="{% url 'signup' %}">
+                        <i class="fa-solid fa-user-plus"></i>
+                        Sign Up
+                    </a>
+                    {% endif %}
+
             </div>
         </nav>
         {% endblock menu %}
-        <div class="container">
+        <main role="main" class="container">
+            {% bootstrap_messages %}
             {% block content %}
             {% endblock content %}
-        </div>
+        </main>
     </body>
 </html>

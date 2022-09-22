@@ -1,12 +1,19 @@
 {% extends 'flatpages/default.html' %}
 
+{% load bootstrap4 %}
+
+{% block title %}Article delete{% endblock title %}
+
 {% block content %}
 <h1>Article delete</h1>
 <hr>
 <form action="" method="post">
     {% csrf_token %}
+    {% bootstrap_form form %}
     <p>Are you sure you want to delete the article "{{ post.title }}"?</p>
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{% url 'article_list' %}" class="btn btn-secondary">Cancel</a>
+    {% buttons %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'article_list' %}" class="btn btn-secondary">Cancel</a>
+    {% endbuttons %}
 </form>
 {% endblock content %}
