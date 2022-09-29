@@ -1,0 +1,55 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}{% if category %}"{{ category.name }}"{% else %}All{% endif %} news{% endblock title %}
+
+{% block content %}
+<h1>{% if category %}"{{ category.name }}"{% else %}All{% endif %} news</h1>
+<hr>
+    {% if category %}
+        <a href="{% url 'news_list' %}" class="btn btn-primary">Show all news</a>
+        {% if already_subscribed %}
+            <a href="{% url 'news_category_unsubscribe' category=category.id %}" class="btn btn-danger float-end">Unsubscribe</a>
+        {% else %}
+            <a href="{% url 'news_category_subscribe' category=category.id %}" class="btn btn-success float-end">Subscribe</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'news_create' %}" class="btn btn-success">Add news</a>
+        {% if not filter.is_applied %}
+        <a href="{% url 'news_search' %}" class="btn btn-primary float-end">Search</a>
+        {% else %}
+        <a href="{% url 'news_list' %}" class="btn btn-danger float-end">Reset filter</a>
+        {% endif %}
+    {% endif %}
+<hr>
+{% if news_list %}
+<table width="100%">
+    <tr>
+        <th width="250">Title</th>
+        <th width="150">Date</th>
+        <th width="300">Categories</th>
+        <th width="*">Description</th>
+        <th width="50"></th>
+        <th width="65"></th>
+   </tr>
+    {% for news in news_list %}
+    <tr>
+        <td><a href="{% url 'news_detail' pk=news.id %}">{{ news.title|censor }}</a></td>
+        <td>{{ news.date_created|date:"d M Y H:i" }}</td>
+        <td>
+            {% for category in news.categories.all %}
+                <a href="{% url 'news_category' category=category.id %}">{{ category.name }}</a>{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ news.content|truncatewords:20|censor }}</td>
+        <td><a href="{% url 'news_edit' pk=news.id %}">[ Edit ]</a></td>
+        <td><a href="{% url 'news_delete' pk=news.id %}" class="text-danger small">[ Delete ]</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+   <h2>No news!</h2>
+{% endif %}
+{% include "flatpages/_pagination.html" %}
+{% endblock content %}

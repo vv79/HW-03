@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% load custom_filters %}
+    <h1>Hi {{ username }}!</h1>
+    <h3>{{ subject }}</h3>
+    {% for post in posts %}
+    <div style="padding: 0 3px">
+        <h5><a href="{% url route pk=post.id %}">{{ post.title }}</a></h5>
+        <p>{{ post.content|truncatechars:50|censor }}</p>
+    </div>
+    {% endfor %}
+</body>
+</html>

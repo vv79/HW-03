@@ -33,14 +33,24 @@ class Author(models.Model):
         self.save()
 
     def __str__(self):
-        return f'{self.user.username}: {self.rating}'
+        return f'{self.user.first_name} {self.user.last_name} ({self.user.username})'
 
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    subscribers = models.ManyToManyField(User, through='CategorySubscriber')
 
     def __str__(self):
         return self.name
+
+
+class CategorySubscriber(models.Model):
+    type = models.CharField(max_length=8, choices=POST_TYPES, default=article)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = "news_category_subscriber"
 
 
 class Post(models.Model):
@@ -77,6 +87,7 @@ class PostCategory(models.Model):
 
     def __str__(self):
         return self.category.name
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

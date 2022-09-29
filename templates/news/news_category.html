@@ -28,7 +28,11 @@
     <tr>
         <td><a href="{% url 'news_detail' pk=news.id %}">{{ news.title|censor }}</a></td>
        <td>{{ news.date_created|date:"d M Y H:i" }}</td>
-       <td>{{ news.categories.all|join:", " }}</td>
+       <td>
+           {% for category in news.categories.all %}
+           <a href="{% url 'news_category' pk=category.id %}">{{ category.name }}</a>{% if not forloop.last %},{% endif %}
+           {% endfor %}
+       </td>
        <td>{{ news.content|truncatewords:20|censor }}</td>
        <td><a href="{% url 'news_edit' pk=news.id %}">[ Edit ]</a></td>
        <td><a href="{% url 'news_delete' pk=news.id %}" class="text-danger small">[ Delete ]</a></td>

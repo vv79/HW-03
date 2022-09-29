@@ -1,0 +1,56 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+{% load custom_tags %}
+
+{% block title %}{% if category %}"{{ category.name }}"{% else %}All{% endif %} articles{% endblock title %}
+
+{% block content %}
+<h1>{% if category %}"{{ category.name }}"{% else %}All{% endif %} articles</h1>
+<hr>
+    {% if category %}
+        <a href="{% url 'article_list' %}" class="btn btn-primary">Show all articles</a>
+        {% if already_subscribed %}
+            <a href="{% url 'article_category_unsubscribe' category=category.id %}" class="btn btn-danger float-end">Unsubscribe</a>
+        {% else %}
+            <a href="{% url 'article_category_subscribe' category=category.id %}" class="btn btn-success float-end">Subscribe</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'article_create' %}" class="btn btn-success">Add article</a>
+        {% if not filter.is_applied %}
+        <a href="{% url 'article_search' %}" class="btn btn-primary float-end">Search</a>
+        {% else %}
+        <a href="{% url 'article_list' %}" class="btn btn-danger float-end">Reset filter</a>
+        {% endif %}
+    {% endif %}
+<hr>
+{% if article_list %}
+<table width="100%">
+    <tr>
+       <th width="250">Title</th>
+       <th width="150">Date</th>
+       <th width="300">Categories</th>
+       <th width="*">Description</th>
+       <th width="50"></th>
+       <th width="65"></th>
+   </tr>
+    {% for article in article_list %}
+    <tr>
+       <td><a href="{% url 'article_detail' pk=article.id %}">{{ article.title|censor }}</a></td>
+       <td>{{ article.date_created|date:"d M Y H:i" }}</td>
+       <td>
+            {% for category in article.categories.all %}
+            <a href="{% url 'article_category' category=category.id %}">{{ category.name }}</a>{% if not forloop.last %},{% endif %}
+           {% endfor %}
+       </td>
+       <td>{{ article.content|truncatewords:20|censor }}</td>
+       <td><a href="{% url 'article_edit' pk=article.id %}">[ Edit ]</a></td>
+       <td><a href="{% url 'article_delete' pk=article.id %}" class="text-danger small">[ Delete ]</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+   <h2>No articles!</h2>
+{% endif %}
+{% include "flatpages/_pagination.html" %}
+{% endblock content %}
