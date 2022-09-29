@@ -80,7 +80,7 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             send_subscribers_messages,
-            trigger=CronTrigger(day_of_week="thu", hour="*", minute="*"),
+            trigger=CronTrigger(day_of_week="sat", hour="00", minute="00"),
             id="send_subscribers_messages",
             max_instances=1,
             replace_existing=True,
