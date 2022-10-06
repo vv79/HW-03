@@ -6,11 +6,20 @@ from .models import Post, Category, CategorySubscriber, news, article
 from .filters import PostFilter
 from .forms import PostForm
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from .tasks import hello, printer
+from datetime import datetime, timedelta
 
 
 class HomePage(TemplateView):
     template_name = 'homepage.html'
+
+    def get(self, request, *args, **kwargs):
+        # printer.delay(10)
+        # printer.apply_async([10], countdown=5)
+        printer.apply_async([10], eta=datetime.now() + timedelta(seconds=5))
+        hello.delay()
+        return HttpResponse('Hello!')
 
 
 class NewsList(ListView):
@@ -262,6 +271,9 @@ class ArticleCreate(PermissionRequiredMixin, CreateView):
         post = form.save(commit=False)
         post.type = article
         post.author = author
+
+        send_subscribers_messages.delay()
+
         return super().form_valid(form)
 
 
