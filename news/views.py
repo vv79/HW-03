@@ -7,19 +7,11 @@ from .filters import PostFilter
 from .forms import PostForm
 from django.contrib import messages
 from django.http import Http404, HttpResponse
-from .tasks import hello, printer
-from datetime import datetime, timedelta
+from django.core.cache import cache
 
 
 class HomePage(TemplateView):
     template_name = 'homepage.html'
-
-    def get(self, request, *args, **kwargs):
-        # printer.delay(10)
-        # printer.apply_async([10], countdown=5)
-        printer.apply_async([10], eta=datetime.now() + timedelta(seconds=5))
-        hello.delay()
-        return HttpResponse('Hello!')
 
 
 class NewsList(ListView):
@@ -39,7 +31,8 @@ class NewsList(ListView):
 
         if category_id:
             user = self.request.user
-            category = Category.objects.get(id=category_id)
+            category = cache.get_or_set(f'category-{category_id}', Category.objects.get(id=category_id))
+
             context['category'] = category
             if user.is_authenticated:
                 context['already_subscribed'] = CategorySubscriber.objects.filter(type=news, category=category, user=user).exists()
@@ -61,7 +54,10 @@ class NewsList(ListView):
 class NewsCategorySubscribe(RedirectView):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        category = Category.objects.get(id=self.kwargs.get('category'))
+        category = cache.get_or_set(
+            f'category-{self.kwargs.get("category")}',
+            Category.objects.get(id=self.kwargs.get('category'))
+        )
 
         if not category or not user.is_authenticated:
             raise Http404
@@ -85,7 +81,10 @@ class NewsCategorySubscribe(RedirectView):
 class NewsCategoryUnsubscribe(RedirectView):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        category = Category.objects.get(id=self.kwargs.get('category'))
+        category = cache.get_or_set(
+            f'category-{self.kwargs.get("category")}',
+            Category.objects.get(id=self.kwargs.get('category'))
+        )
 
         if not category:
             raise Http404
@@ -125,6 +124,9 @@ class NewsDetail(PermissionRequiredMixin, DetailView):
     template_name = 'news/news.html'
     context_object_name = 'news'
     permission_required = 'news.view_post'
+
+    def get_object(self, *args, **kwargs):
+        return cache.get_or_set(f'post-{self.kwargs["pk"]}', super().get_object(queryset=self.queryset))
 
 
 class NewsCreate(PermissionRequiredMixin, CreateView):
@@ -172,7 +174,11 @@ class ArticleList(ListView):
 
         if category_id:
             user = self.request.user
-            category = Category.objects.get(id=category_id)
+            category = cache.get_or_set(
+                f'category-{category_id}',
+                Category.objects.get(id=category_id)
+            )
+
             context['category'] = category
             if user.is_authenticated:
                 context['already_subscribed'] = CategorySubscriber.objects.filter(type=article, category=category, user=user).exists()
@@ -194,7 +200,10 @@ class ArticleList(ListView):
 class ArticleCategorySubscribe(RedirectView):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        category = Category.objects.get(id=self.kwargs.get('category'))
+        category = cache.get_or_set(
+            f'category-{self.kwargs.get("category")}',
+            Category.objects.get(id=self.kwargs.get('category'))
+        )
 
         if not category:
             raise Http404
@@ -218,7 +227,10 @@ class ArticleCategorySubscribe(RedirectView):
 class ArticleCategoryUnsubscribe(RedirectView):
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        category = Category.objects.get(id=self.kwargs.get('category'))
+        category = cache.get_or_set(
+            f'category-{self.kwargs.get("category")}',
+            Category.objects.get(id=self.kwargs.get('category'))
+        )
 
         if not category:
             raise Http404
@@ -259,6 +271,9 @@ class ArticleDetail(PermissionRequiredMixin, DetailView):
     context_object_name = 'article'
     permission_required = 'news.view_post'
 
+    def get_object(self, *args, **kwargs):
+        return cache.get_or_set(f'post-{self.kwargs["pk"]}', super().get_object(queryset=self.queryset))
+
 
 class ArticleCreate(PermissionRequiredMixin, CreateView):
     form_class = PostForm
@@ -271,9 +286,6 @@ class ArticleCreate(PermissionRequiredMixin, CreateView):
         post = form.save(commit=False)
         post.type = article
         post.author = author
-
-        send_subscribers_messages.delay()
-
         return super().form_valid(form)
 
 

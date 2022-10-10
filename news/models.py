@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 import textwrap
 from django.urls import reverse
+from django.core.cache import cache
 
 POST_PREVIEW_LENGTH = 124
 
@@ -79,6 +80,10 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('article_detail' if type == article else 'news_detail', args=[str(self.id)])
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.delete(f'post-{self.pk}')
 
 
 class PostCategory(models.Model):

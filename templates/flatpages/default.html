@@ -17,9 +17,11 @@
         {% bootstrap_javascript jquery='full' %}
     </head>
     <body>
+        {% load cache %}
         {% block menu %}
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
             <div class="container">
+                {% cache 86400 menu_main_block %}
                 <a class="navbar-brand" href="#">News Paper</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse">
@@ -30,18 +32,22 @@
                         <li class="nav-item"><a class="nav-link{% if request.resolver_match.view_name == 'protected' %} active{% endif %}" aria-current="page" href="{% url 'protected' %}">Protected page</a></li>
                     </ul>
                 </div>
+                {% endcache %}
                 {% if request.user.is_authenticated %}
                     <span class="navbar-text mx-2">You are loggen in as:</span>
                     <a class="navbar-text{% if request.resolver_match.view_name == 'profile' %} active{% endif %}" aria-current="page" href="{% url 'profile' %}">
                         <i class="fa-solid fa-user"></i>
                         {{ request.user.username }}
                     </a>
+                    {% cache 86400 menu_not_authenticated_block1 %}
                     <span class="navbar-text mx-2">|</span>
                     <a class="navbar-text{% if request.resolver_match.view_name == 'logout' %} active{% endif %}" aria-current="page" href="{% url 'logout' %}">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         Logout
                     </a>
-                    {% else %}
+                    {% endcache %}
+                {% else %}
+                    {% cache 86400 menu_not_authenticated_block2 %}
                     <a class="navbar-text{% if request.resolver_match.view_name == 'login' %} active{% endif %}" aria-current="page" href="{% url 'login' %}">
                         <i class="fa-solid fa-right-to-bracket"></i>
                         Login
@@ -51,8 +57,8 @@
                         <i class="fa-solid fa-user-plus"></i>
                         Sign Up
                     </a>
-                    {% endif %}
-
+                    {% endcache %}
+                {% endif %}
             </div>
         </nav>
         {% endblock menu %}
