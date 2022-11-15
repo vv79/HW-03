@@ -6,11 +6,13 @@ from .models import Post, Category, CategorySubscriber, news, article
 from .filters import PostFilter
 from .forms import PostForm
 from django.contrib import messages
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.core.cache import cache
-
+import logging
 
 class HomePage(TemplateView):
+    logger = logging.getLogger('django.server')
+    logger.critical("Error!!!")
     template_name = 'homepage.html'
 
 

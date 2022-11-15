@@ -65,7 +65,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    'news.middleware.TemplateMiddleware'
 ]
 
 ROOT_URLCONF = 'newsPaper.urls'
@@ -271,5 +272,121 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://localhost:6379'
+    }
+}
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console_debug_format': {
+            'format': '%(asctime)s %(levelname)s - %(message)s'
+        },
+        'console_warning_format': {
+            'format': '%(asctime)s %(levelname)s - %(message)s - %(pathname)s'
+        },
+        'console_critical_error_format': {
+            'format': '%(asctime)s %(levelname)s - %(message)s - %(pathname)s - %(exc_info)s'
+        },
+        'mail_format': {
+            'format': '%(asctime)s %(levelname)s - %(message)s - %(pathname)s'
+        },
+        'security_format': {
+            'format': '%(asctime)s %(levelname)s - %(module)s - %(message)s'
+        },
+        'general_log_format': {
+            'format': '%(asctime)s %(levelname)s - %(module)s - %(message)s'
+        },
+    },
+
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        'console_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_debug_format',
+            'filters': ['require_debug_true'],
+        },
+        'console_warning': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_warning_format',
+        },
+        'console_error_critical': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console_critical_error_format',
+        },
+        'general_file': {
+            'class': "logging.FileHandler",
+            'filename': "general.log",
+            'level': "INFO",
+            'formatter': 'general_log_format',
+        },
+        'errors_log_file': {
+            'class': "logging.FileHandler",
+            'filename': "errors.log",
+            'level': "ERROR",
+            'formatter': 'console_critical_error_format',
+        },
+        'security_log_file': {
+            'class': "logging.FileHandler",
+            'filename': "security.log",
+            'level': "WARNING",
+            'formatter': "",
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'mail_format',
+        },
+    },
+    'loggers': {
+        'console_debug': {
+            'handlers': ['console_debug'],
+            'propagate': True,
+        },
+        'console_warning': {
+            'handlers': ['console_warning'],
+            'propagate': True,
+        },
+        'console_error': {
+            'handlers': ['console_error_critical'],
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['general_file'],
+            'level': 'INFO',
+        },
+        'django.request': {
+            'handlers': ['mail_admins', 'errors_log_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['mail_admins', 'errors_log_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.db_backends': {
+            'handlers': ['errors_log_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['errors_log_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['security_log_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        }
     }
 }
