@@ -1,18 +1,19 @@
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}
+{% load i18n %}
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
 
-{% block title %}
-Article detail
-{% endblock title %}
+{% block title %}{% translate 'Article detail' %}{% endblock title %}
 
 {% block content %}
 <h1>{{ article.title|censor }}</h1>
 <hr/>
-<h3>{{ article.date_created|date:"d M Y" }}</h3>
+<h3>{{ article.date_created|timezone:TIME_ZONE|date:"d M Y" }}</h3>
 <hr/>
-<a href="{% url 'article_edit' pk=article.id %}" class="btn btn-primary">Edit</a>
-<a href="{% url 'article_delete' pk=article.id %}" class="btn btn-danger">Delete</a>
+<a href="{% url 'article_edit' pk=article.id %}" class="btn btn-primary">{% translate 'Edit' %}</a>
+<a href="{% url 'article_delete' pk=article.id %}" class="btn btn-danger">{% translate 'Delete' %}</a>
 <hr/>
 {{ article.content|censor }}
 {% endblock content %}

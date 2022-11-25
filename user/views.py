@@ -6,6 +6,7 @@ from django.views.generic import RedirectView
 from django.contrib.auth.forms import PasswordChangeForm
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from .forms import BaseSignupForm, BaseProfileForm
 
 
@@ -15,7 +16,7 @@ class UserLoginView(LoginView):
 
 class UserLogoutView(LogoutView):
     def dispatch(self, request, *args, **kwargs):
-        messages.success(request, "You are successfully logged out.")
+        messages.success(request, _("You are successfully logged out."))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -27,7 +28,7 @@ class UserRegistrationView(CreateView):
     success_url = reverse_lazy('homepage')
 
     def form_valid(self, form):
-        messages.success(self.request, "Your account was successfully created.")
+        messages.success(self.request, _("Your account was successfully created."))
 
         return super().form_valid(form)
 
@@ -43,7 +44,7 @@ class UserProfileView(LoginRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, "Your profile was successfully updated.")
+        messages.success(self.request, _("Your profile was successfully updated."))
 
         return super().form_valid(form)
 
@@ -60,7 +61,7 @@ class UserPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'user/change_password.html'
 
     def form_valid(self, form):
-        messages.success(self.request, "Password was successfully changed.")
+        messages.success(self.request, _("Password was successfully changed."))
 
         return super().form_valid(form)
 
@@ -78,7 +79,7 @@ class UserUpgradeView(LoginRequiredMixin, RedirectView):
         if not request.user.groups.filter(name='authors').exists():
             authors_group.user_set.add(user)
 
-        messages.success(request, "Congratulations, you are now an author.")
+        messages.success(request, _("Congratulations, you are now an author."))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -93,7 +94,7 @@ class UserDowngradeView(LoginRequiredMixin, RedirectView):
         if request.user.groups.filter(name='authors').exists():
             authors_group.user_set.remove(user)
 
-        messages.success(request, "Congratulations, you are no longer an author")
+        messages.success(request, _("Congratulations, you are no longer an author."))
 
         return super().dispatch(request, *args, **kwargs)
 

@@ -32,3 +32,8 @@ def hide_forbidden(value):
         else:
             result.append(word)
     return " ".join(result)
+
+@register.filter
+def concat(arg1, arg2):
+    """concatenate arg1 & arg2"""
+    return str(arg1) + str(arg2)

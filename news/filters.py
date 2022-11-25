@@ -1,23 +1,24 @@
 from django_filters import FilterSet, CharFilter, DateTimeFilter, ModelChoiceFilter
 from django.forms import DateTimeInput
 from .models import Post, Category
+from django.utils.translation import gettext_lazy as _
 
 
 class PostFilter(FilterSet):
     title = CharFilter(
         field_name='title',
-        label='Title',
+        label=_('Title'),
         lookup_expr='icontains'
     )
     category = ModelChoiceFilter(
         field_name='categories',
         queryset=Category.objects.all(),
-        label='Category',
+        label=_('Category'),
         empty_label='Choose category ...'
     )
     added_after = DateTimeFilter(
         field_name='date_created',
-        label='Added after',
+        label=_('Added after'),
         lookup_expr='gt',
         widget=DateTimeInput(
             format='%Y-%m-%dT%H:%M',

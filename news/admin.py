@@ -1,14 +1,15 @@
 from django.contrib import admin
 from .models import Post
+from modeltranslation.admin import TranslationAdmin
 
 
 def nullify_rating(modeladmin, request, queryset):
     queryset.update(rating=0)
     nullify_rating.short_description = 'Nullify rating'
 
-
 @admin.register(Post)
-class PostsAdmin(admin.ModelAdmin):
+class PostsAdmin(TranslationAdmin):
+    model = Post
     list_display = ('title', 'type', 'author', 'rating', 'date_created')
     list_filter = ('title', 'type', 'author', 'rating', 'date_created')
     search_fields = ('title', 'author__user__first_name', 'author__user__last_name', 'author__user__username')

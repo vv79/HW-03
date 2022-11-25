@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
-from django.shortcuts import resolve_url
+from django.shortcuts import resolve_url, redirect
+from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
 from .models import Post, Category, CategorySubscriber, news, article
 from .filters import PostFilter
@@ -8,12 +9,22 @@ from .forms import PostForm
 from django.contrib import messages
 from django.http import Http404
 from django.core.cache import cache
+from django.utils.translation import gettext as _
 import logging
+
 
 class HomePage(TemplateView):
     logger = logging.getLogger('django.server')
     logger.critical("Error!!!")
     template_name = 'homepage.html'
+
+
+class TimeZone(View):
+    def post(self, request):
+        request.session['django_timezone'] = request.POST['timezone']
+        referer = request.META.get('HTTP_REFERER')
+
+        return redirect(referer) if referer else redirect(resolve_url('homepage'))
 
 
 class NewsList(ListView):
@@ -70,9 +81,9 @@ class NewsCategorySubscribe(RedirectView):
             subscriber = CategorySubscriber.objects.create(type=news, category=category, user=user)
             subscriber.save()
 
-            messages.success(request, "Congratulations, you are now subscribed to news in this category.")
+            messages.success(request, _("Congratulations, you are now subscribed to news in this category."))
         else:
-            messages.error(request, "You are already subscribed to news in this category.")
+            messages.error(request, _("You are already subscribed to news in this category."))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -96,9 +107,9 @@ class NewsCategoryUnsubscribe(RedirectView):
         if category_subscriber:
             category_subscriber.delete()
 
-            messages.success(request, "Congratulations, you are now unsubscribed to news in this category.")
+            messages.success(request, _("Congratulations, you are now unsubscribed to news in this category."))
         else:
-            messages.error(request, "You are not subscribed to news in this category.")
+            messages.error(request, _("You are not subscribed to news in this category."))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -216,9 +227,9 @@ class ArticleCategorySubscribe(RedirectView):
             subscriber = CategorySubscriber.objects.create(type=article, category=category, user=user)
             subscriber.save()
 
-            messages.success(request, "Congratulations, you are now subscribed to articles in this category.")
+            messages.success(request, _("Congratulations, you are now subscribed to articles in this category."))
         else:
-            messages.error(request, "You are already subscribed to articles in this category.")
+            messages.error(request, _("You are already subscribed to articles in this category."))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -242,9 +253,9 @@ class ArticleCategoryUnsubscribe(RedirectView):
         if category_subscriber:
             category_subscriber.delete()
 
-            messages.success(request, "Congratulations, you are now unsubscribed to articles in this category.")
+            messages.success(request, _("Congratulations, you are now unsubscribed to articles in this category."))
         else:
-            messages.error(request, "You are not subscribed to articles in this category.")
+            messages.error(request, _("You are not subscribed to articles in this category."))
 
         return super().dispatch(request, *args, **kwargs)
 

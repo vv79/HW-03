@@ -1,18 +1,25 @@
 {% extends 'flatpages/default.html' %}
 
 {% load bootstrap4 %}
+{% load i18n %}
 
-{% block title %}{% if request.resolver_match.view_name == 'news_create' %}Create{% else %}Edit{% endif %} news{% endblock title %}
+{% block title %}
+    {% if request.resolver_match.view_name == 'news_create' %}
+        {% blocktranslate asvar page_title %}Create news{% endblocktranslate %}
+    {% else %}
+        {% blocktranslate asvar page_title %}Edit news{% endblocktranslate %}
+    {% endif %}
+{% endblock title %}
 
 {% block content %}
-<h1>{% if request.resolver_match.view_name == 'news_create' %}Create{% else %}Edit{% endif %} news</h1>
+<h1>{{ page_title }}</h1>
 <hr>
 <form action="" method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="{% url 'news_list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">{% translate 'Save' %}</button>
+        <a href="{% url 'news_list' %}" class="btn btn-secondary">{% translate 'Cancel' %}</a>
     {% endbuttons %}
 </form>
 {% endblock content %}

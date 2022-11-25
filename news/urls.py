@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 from .views import (
    HomePage,
+   TimeZone,
    NewsList,
    NewsCategorySubscribe,
    NewsCategoryUnsubscribe,
@@ -22,9 +23,10 @@ from .views import (
 )
 
 urlpatterns = [
-   path('', cache_page(60)(HomePage.as_view()), name='homepage'),
+   path('', HomePage.as_view(), name='homepage'),
+   path('set/timezone/', TimeZone.as_view(), name='set_timezone'),
 
-   path('news/', cache_page(5*60)(NewsList.as_view()), name='news_list'),
+   path('news/', NewsList.as_view(), name='news_list'),
    path('news/category/<int:category>', NewsList.as_view(), name='news_category'),
    path('news/category/<int:category>/subscribe', login_required(NewsCategorySubscribe.as_view()), name='news_category_subscribe'),
    path('news/category/<int:category>/unsubscribe', login_required(NewsCategoryUnsubscribe.as_view()), name='news_category_unsubscribe'),
@@ -34,7 +36,7 @@ urlpatterns = [
    path('news/<int:pk>/edit/', NewsUpdate.as_view(), name='news_edit'),
    path('news/<int:pk>/delete/', NewsDelete.as_view(), name='news_delete'),
 
-   path('articles/', cache_page(5*60)(ArticleList.as_view()), name='article_list'),
+   path('articles/', ArticleList.as_view(), name='article_list'),
    path('articles/category/<int:category>', ArticleList.as_view(), name='article_category'),
    path('articles/category/<int:category>/subscribe', login_required(ArticleCategorySubscribe.as_view()), name='article_category_subscribe'),
    path('articles/category/<int:category>/unsubscribe', login_required(ArticleCategoryUnsubscribe.as_view()), name='article_category_unsubscribe'),

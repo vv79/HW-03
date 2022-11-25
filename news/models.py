@@ -4,6 +4,7 @@ from django.db.models import Sum
 import textwrap
 from django.urls import reverse
 from django.core.cache import cache
+from django.utils.translation import gettext_lazy as _
 
 POST_PREVIEW_LENGTH = 124
 
@@ -59,9 +60,13 @@ class Post(models.Model):
     type = models.CharField(max_length=8, choices=POST_TYPES, default=article)
     date_created = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category, through='PostCategory')
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, )
     content = models.TextField()
     rating = models.IntegerField(default=0)
+
+    class Meta:
+        verbose_name = _('Post')
+        verbose_name_plural = _('Posts')
 
     def like(self):
         self.rating += 1

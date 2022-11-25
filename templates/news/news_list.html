@@ -1,55 +1,64 @@
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}
+{% load i18n %}
+{% load tz %}
+{% get_current_timezone as TIME_ZONE %}
 
-{% block title %}{% if category %}"{{ category.name }}"{% else %}All{% endif %} news{% endblock title %}
+{% block title %}
+    {% if category %}
+        {% blocktranslate asvar page_title %}"{{ category.name }}" news{% endblocktranslate %}
+    {% else %}
+        {% blocktranslate asvar page_title %}All news{% endblocktranslate %}
+    {% endif %}
+{% endblock title %}
 
 {% block content %}
-<h1>{% if category %}"{{ category.name }}"{% else %}All{% endif %} news</h1>
+<h1>{{ page_title }}</h1>
 <hr>
     {% if category %}
-        <a href="{% url 'news_list' %}" class="btn btn-primary">Show all news</a>
+        <a href="{% url 'news_list' %}" class="btn btn-primary">{% translate 'Show all news' %}</a>
         {% if already_subscribed %}
-            <a href="{% url 'news_category_unsubscribe' category=category.id %}" class="btn btn-danger float-end">Unsubscribe</a>
+            <a href="{% url 'news_category_unsubscribe' category=category.id %}" class="btn btn-danger float-end">{% translate 'Unsubscribe' %}</a>
         {% else %}
-            <a href="{% url 'news_category_subscribe' category=category.id %}" class="btn btn-success float-end">Subscribe</a>
+            <a href="{% url 'news_category_subscribe' category=category.id %}" class="btn btn-success float-end">{% translate 'Subscribe' %}</a>
         {% endif %}
     {% else %}
-        <a href="{% url 'news_create' %}" class="btn btn-success">Add news</a>
+        <a href="{% url 'news_create' %}" class="btn btn-success">{% translate 'Add news' %}</a>
         {% if not filter.is_applied %}
-        <a href="{% url 'news_search' %}" class="btn btn-primary float-end">Search</a>
+        <a href="{% url 'news_search' %}" class="btn btn-primary float-end">{% translate 'Search' %}</a>
         {% else %}
-        <a href="{% url 'news_list' %}" class="btn btn-danger float-end">Reset filter</a>
+        <a href="{% url 'news_list' %}" class="btn btn-danger float-end">{% translate 'Reset filter' %}</a>
         {% endif %}
     {% endif %}
 <hr>
 {% if news_list %}
 <table width="100%">
     <tr>
-        <th width="250">Title</th>
-        <th width="150">Date</th>
-        <th width="300">Categories</th>
-        <th width="*">Description</th>
+        <th width="250">{% translate 'Title' %}</th>
+        <th width="150">{% translate 'Date' %}</th>
+        <th width="200">{% translate 'Categories' %}</th>
+        <th width="*">{% translate 'Description' %}</th>
         <th width="50"></th>
         <th width="65"></th>
    </tr>
     {% for news in news_list %}
     <tr>
         <td><a href="{% url 'news_detail' pk=news.id %}">{{ news.title|censor }}</a></td>
-        <td>{{ news.date_created|date:"d M Y H:i" }}</td>
+        <td>{{ news.date_created|timezone:TIME_ZONE|date:"d M Y H:i" }}</td>
         <td>
             {% for category in news.categories.all %}
                 <a href="{% url 'news_category' category=category.id %}">{{ category.name }}</a>{% if not forloop.last %},{% endif %}
             {% endfor %}
         </td>
         <td>{{ news.content|truncatewords:20|censor }}</td>
-        <td><a href="{% url 'news_edit' pk=news.id %}">[ Edit ]</a></td>
-        <td><a href="{% url 'news_delete' pk=news.id %}" class="text-danger small">[ Delete ]</a></td>
+        <td nowrap><a href="{% url 'news_edit' pk=news.id %}">[ {% translate 'Edit' %} ]</a></td>
+        <td nowrap><a href="{% url 'news_delete' pk=news.id %}" class="text-danger small">[ {% translate 'Delete' %} ]</a></td>
     </tr>
     {% endfor %}
 </table>
 {% else %}
-   <h2>No news!</h2>
+   <h2>{% translate 'No news!' %}</h2>
 {% endif %}
 {% include "flatpages/_pagination.html" %}
 {% endblock content %}

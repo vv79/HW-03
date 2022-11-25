@@ -1,7 +1,9 @@
 {% extends 'flatpages/default.html' %}
 
-{% block title %}Protected page{% endblock title %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate asvar page_title %}Protected page{% endblocktranslate %}{% endblock title %}
 
 {% block content %}
-<h2>Protected page</h2>
+<h2>{{ page_title }}</h2>
 {% endblock %}
